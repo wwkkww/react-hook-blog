@@ -36,13 +36,29 @@ function EditPost() {
         draft.isFetching = false;
         return;
       case 'titleChange':
+        draft.title.hasErrors = false;
         draft.title.value = action.value;
         return;
+      case 'validateTitle':
+        if (!action.value.trim()) {
+          draft.title.hasErrors = true;
+          draft.title.message = 'Title cannot be blank';
+        }
+        return;
       case 'bodyChange':
+        draft.body.hasErrors = false;
         draft.body.value = action.value;
         return;
+      case 'validateBody':
+        if (!action.value.trim()) {
+          draft.body.hasErrors = true;
+          draft.body.message = 'Body content cannot be blank';
+        }
+        return;
       case 'submitRequest':
-        draft.sendCount++;
+        if (!draft.title.hasErrors && !draft.body.hasErrors) {
+          draft.sendCount++;
+        }
         return;
       case 'savingRequest':
         draft.isSaving = true;
@@ -120,6 +136,8 @@ function EditPost() {
 
   function handleSubmit(e) {
     e.preventDefault();
+    dispatch({ type: 'validateTitle', value: state.title.value });
+    dispatch({ type: 'validateBody', value: state.body.value });
     dispatch({ type: 'submitRequest' });
     console.log(originalState);
     console.log(state);
@@ -148,8 +166,14 @@ function EditPost() {
             placeholder=""
             autoComplete="off"
             onChange={e => dispatch({ type: 'titleChange', value: e.target.value })}
+            onBlur={e => dispatch({ type: 'validateTitle', value: e.target.value })}
             value={state.title.value}
           />
+          {state.title.hasErrors && (
+            <div className="alert alert-danger small liveValidateMessage">
+              {state.title.message}
+            </div>
+          )}
         </div>
 
         <div className="form-group">
@@ -162,8 +186,12 @@ function EditPost() {
             className="body-content tall-textarea form-control"
             type="text"
             onChange={e => dispatch({ type: 'bodyChange', value: e.target.value })}
+            onBlur={e => dispatch({ type: 'validateBody', value: e.target.value })}
             value={state.body.value}
           />
+          {state.body.hasErrors && (
+            <div className="alert alert-danger small liveValidateMessage">{state.body.message}</div>
+          )}
         </div>
 
         <button className="btn btn-primary" disabled={state.isSaving}>
