@@ -6,6 +6,7 @@ import Page from './Page';
 import LoadingDotsIcon from './LoadingDotsIcon';
 import StateContext from '../StateContext';
 import DispatchContext from '../DispatchContext';
+import NotFound from './NotFound';
 
 function EditPost() {
   const appState = useContext(StateContext);
@@ -26,6 +27,7 @@ function EditPost() {
     isSaving: false,
     id: useParams().id,
     sendCount: 0,
+    notFound: false,
   };
 
   function postReducer(draft, action) {
@@ -66,6 +68,9 @@ function EditPost() {
       case 'requestSaved':
         draft.isSaving = false;
         return;
+      case 'notFound':
+        draft.notFound = true;
+        return;
     }
   }
 
@@ -87,7 +92,11 @@ function EditPost() {
         /** REPLACE with reducer */
         // setPost(response.data);
         // setIsLoading(false);
-        dispatch({ type: 'fetchComplete', value: response.data });
+        if (response.data) {
+          dispatch({ type: 'fetchComplete', value: response.data });
+        } else {
+          dispatch({ type: 'notFound' });
+        }
       } catch (error) {
         console.log('error', error);
       }
@@ -105,7 +114,7 @@ function EditPost() {
       dispatch({ type: 'savingRequest' });
 
       const fetchRequest = Axios.CancelToken.source();
-      async function fetchPost() {
+      async function updatePost() {
         try {
           const response = await Axios.post(
             `/post/${state.id}/edit`,
@@ -125,7 +134,7 @@ function EditPost() {
           console.log('error', error);
         }
       }
-      fetchPost();
+      updatePost();
 
       // clean up before unmounted
       return () => {
@@ -143,6 +152,8 @@ function EditPost() {
     console.log(state);
   }
 
+  if (state.notFound) return <NotFound />;
+
   if (state.isFetching)
     return (
       <Page title="loading...">
@@ -152,7 +163,10 @@ function EditPost() {
 
   return (
     <Page title="Edit Post">
-      <form onSubmit={handleSubmit}>
+      <Link className="small font-weight-bold" to={`/post/${state.id}`}>
+        &laquo; Back to posts
+      </Link>
+      <form className="mt-3" onSubmit={handleSubmit}>
         <div className="form-group">
           <label htmlFor="post-title" className="text-muted mb-1">
             <small>Title</small>

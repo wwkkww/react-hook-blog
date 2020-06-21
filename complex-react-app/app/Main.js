@@ -20,18 +20,9 @@ import FlashMessages from './components/FlashMessages';
 import Profile from './components/Profile';
 // import ExampleContext from './ExampleContext';
 import EditPost from './components/EditPost';
+import NotFound from './components/NotFound';
 
 function Main() {
-  const initialState = {
-    loggedIn: Boolean(localStorage.getItem('complexappToken')),
-    flashMessages: [],
-    user: {
-      token: localStorage.getItem('complexappToken'),
-      username: localStorage.getItem('complexappUsername'),
-      avatar: localStorage.getItem('complexappAvatar'),
-    },
-  };
-
   /**
    * ! #1. REACT useReducer
    * -  useReducer accept the original state as args. Never directly mutate the state
@@ -48,6 +39,16 @@ function Main() {
   //       return { loggedIn: state.loggedIn, flashMessages: state.flashMessages.concat(action.value) };
   //   }
   // }
+
+  const initialState = {
+    loggedIn: Boolean(localStorage.getItem('complexappToken')),
+    flashMessages: [],
+    user: {
+      token: localStorage.getItem('complexappToken'),
+      username: localStorage.getItem('complexappUsername'),
+      avatar: localStorage.getItem('complexappAvatar'),
+    },
+  };
 
   /**
    * ! #2. IMMER userImmerReducer
@@ -118,6 +119,9 @@ function Main() {
             </Route>
             <Route path="/terms">
               <Terms />
+            </Route>
+            <Route>
+              <NotFound />
             </Route>
           </Switch>
           <Footer />
