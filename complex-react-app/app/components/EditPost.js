@@ -17,29 +17,42 @@ function EditPost() {
       hasErrors: false,
       message: '',
     },
-    loading: true,
-    saveIsLoading: false,
+    isFetching: true,
+    isSaving: false,
+    id: useParams().id,
+    sendCount: 0,
   };
 
-  function postReducer() {}
+  function postReducer(draft, action) {
+    switch (action.type) {
+      case 'fetchComplete':
+        draft.title.value = action.value.title;
+        draft.body.value = action.value.body;
+        draft.isFetching = false;
+        return;
+    }
+  }
 
   const [state, dispatch] = useImmerReducer(postReducer, originalState);
-  const [isLoading, setIsLoading] = useState(true);
-  const [post, setPost] = useState();
-  const { id } = useParams();
+
+  /** REPLACE with reducer */
+  // const [isLoading, setIsLoading] = useState(true);
+  // const [post, setPost] = useState();
+  // const { id } = useParams();
 
   useEffect(() => {
     const fetchRequest = Axios.CancelToken.source();
 
     async function fetchPost() {
       try {
-        const response = await Axios.get(`/post/${id}`, {
+        const response = await Axios.get(`/post/${state.id}`, {
           cancelToken: fetchRequest.token,
         });
         console.log(response);
-
-        setPost(response.data);
-        setIsLoading(false);
+        /** REPLACE with reducer */
+        // setPost(response.data);
+        // setIsLoading(false);
+        dispatch({ type: 'fetchComplete', value: response.data });
       } catch (error) {
         console.log('error', error);
       }
@@ -52,15 +65,13 @@ function EditPost() {
     };
   }, []);
 
-  if (isLoading)
+  if (state.isFetching)
     return (
       <Page title="loading...">
         <LoadingDotsIcon />
       </Page>
     );
 
-  const date = new Date(post.createdDate);
-  const dateFormatted = `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
   return (
     <Page title="Edit Post">
       <form>
@@ -76,8 +87,8 @@ function EditPost() {
             type="text"
             placeholder=""
             autoComplete="off"
-            // onChange={(e) => setTitle(e.target.value)}
-            value={post.title}
+            onChange={(e) => console.log(e.target.value)}
+            value={state.title.value}
           />
         </div>
 
@@ -90,8 +101,8 @@ function EditPost() {
             id="post-body"
             className="body-content tall-textarea form-control"
             type="text"
-            //onChange={(e) => setBody(e.target.value)}
-            value={post.body}
+            onChange={(e) => console.log(e.target.value)}
+            value={state.body.value}
           />
         </div>
 
