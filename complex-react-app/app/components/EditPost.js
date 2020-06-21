@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, withRouter } from 'react-router-dom';
 import { useImmerReducer } from 'use-immer';
 import Axios from 'axios';
 import Page from './Page';
@@ -8,7 +8,7 @@ import StateContext from '../StateContext';
 import DispatchContext from '../DispatchContext';
 import NotFound from './NotFound';
 
-function EditPost() {
+function EditPost(props) {
   const appState = useContext(StateContext);
   const appDispatch = useContext(DispatchContext);
 
@@ -94,6 +94,11 @@ function EditPost() {
         // setIsLoading(false);
         if (response.data) {
           dispatch({ type: 'fetchComplete', value: response.data });
+
+          if (appState.user.username !== response.data.author.username) {
+            appDispatch({ type: 'flashMessage', value: 'Unauthorized access' });
+            props.history.push('/');
+          }
         } else {
           dispatch({ type: 'notFound' });
         }
@@ -216,4 +221,4 @@ function EditPost() {
   );
 }
 
-export default EditPost;
+export default withRouter(EditPost);
