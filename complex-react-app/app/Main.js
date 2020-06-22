@@ -2,6 +2,7 @@ import React, { useState, useReducer, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter, Switch, Route } from 'react-router-dom';
 import { useImmerReducer } from 'use-immer';
+import { CSSTransition } from 'react-transition-group';
 import StateContext from './StateContext';
 import DispatchContext from './DispatchContext';
 import Axios from 'axios';
@@ -21,6 +22,7 @@ import Profile from './components/Profile';
 // import ExampleContext from './ExampleContext';
 import EditPost from './components/EditPost';
 import NotFound from './components/NotFound';
+import Search from './components/Search';
 
 function Main() {
   /**
@@ -48,6 +50,7 @@ function Main() {
       username: localStorage.getItem('complexappUsername'),
       avatar: localStorage.getItem('complexappAvatar'),
     },
+    isSearchOpen: false,
   };
 
   /**
@@ -66,6 +69,12 @@ function Main() {
         return;
       case 'flashMessage':
         draft.flashMessages.push(action.value); // we can modify the array now
+        return;
+      case 'openSearch':
+        draft.isSearchOpen = true;
+        return;
+      case 'closeSearch':
+        draft.isSearchOpen = false;
         return;
     }
   }
@@ -124,6 +133,15 @@ function Main() {
               <NotFound />
             </Route>
           </Switch>
+          <CSSTransition
+            timeout={330}
+            in={state.isSearchOpen}
+            classNames="search-overlay"
+            unmountOnExit
+          >
+            <Search />
+          </CSSTransition>
+          {/* {state.isSearchOpen ? <Search /> : ''} */}
           <Footer />
         </BrowserRouter>
       </DispatchContext.Provider>
