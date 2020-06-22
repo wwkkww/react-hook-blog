@@ -23,6 +23,7 @@ import Profile from './components/Profile';
 import EditPost from './components/EditPost';
 import NotFound from './components/NotFound';
 import Search from './components/Search';
+import Chat from './components/Chat';
 
 function Main() {
   /**
@@ -51,6 +52,7 @@ function Main() {
       avatar: localStorage.getItem('complexappAvatar'),
     },
     isSearchOpen: false,
+    isChatOpen: false,
   };
 
   /**
@@ -75,6 +77,12 @@ function Main() {
         return;
       case 'closeSearch':
         draft.isSearchOpen = false;
+        return;
+      case 'toggleChat':
+        draft.isChatOpen = !draft.isChatOpen;
+        return;
+      case 'closeChat':
+        draft.isChatOpen = false;
         return;
     }
   }
@@ -142,6 +150,9 @@ function Main() {
             <Search />
           </CSSTransition>
           {/* {state.isSearchOpen ? <Search /> : ''} */}
+
+          {/* NOTE: do not use CSSTransition because we do no want the chat component to be unmounted when chat is close. Chat needs to be always connected to server */}
+          <Chat />
           <Footer />
         </BrowserRouter>
       </DispatchContext.Provider>
