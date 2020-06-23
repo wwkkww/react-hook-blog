@@ -10,6 +10,7 @@ const socket = io('http://localhost:8080');
 
 function Chat() {
   const chatField = useRef(null);
+  const chatLog = useRef(null);
   const appState = useContext(StateContext);
   const appDispatch = useContext(DispatchContext);
   const [state, setState] = useImmer({
@@ -30,6 +31,12 @@ function Chat() {
       });
     });
   }, []);
+
+  useEffect(() => {
+    // to scroll to the bottom, set the chatLog scrollTop (how far down it will scroll)
+    // as the entire height (scroll to very bottom)
+    chatLog.current.scrollTop = chatLog.current.scrollHeight;
+  }, [state.chatMessages]);
 
   function handleFieldChange(e) {
     const value = e.target.value;
@@ -71,7 +78,7 @@ function Chat() {
           <i className="fas fa-times-circle"></i>
         </span>
       </div>
-      <div id="chat" className="chat-log">
+      <div id="chat" className="chat-log" ref={chatLog}>
         {state.chatMessages.map((message, index) => {
           if (message.username === appState.user.username) {
             return (
