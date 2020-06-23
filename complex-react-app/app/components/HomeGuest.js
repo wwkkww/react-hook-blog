@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useImmerReducer } from 'use-immer';
 import { CSSTransition } from 'react-transition-group';
 import Page from './Page';
@@ -51,16 +51,46 @@ function HomeGuest() {
         }
         return;
       case 'usernameDelay':
+        // draft.username.hasErrors = false;
+        if (draft.username.value.length < 3) {
+          draft.username.hasErrors = true;
+          draft.username.message = 'Username must be at least 3 characters.';
+        }
+        if (!draft.username.hasErrors) {
+          draft.username.checkCount++;
+        }
         return;
       case 'usernameUnique':
+        if (action.value) {
+          draft.username.hasErrors = true;
+          draft.username.isUnique = false;
+          draft.username.message = 'Username is already taken.';
+        } else {
+          draft.username.isUnique = true;
+        }
         return;
       case 'emailImmediately':
+        // no checking done immediately after user type
         draft.email.hasErrors = false;
         draft.email.value = action.value;
         return;
       case 'emailDelay':
+        if (!/^\S+@\S+$/.test(draft.email.value)) {
+          draft.email.hasErrors = true;
+          draft.email.message = 'Please provide a valid email address.';
+        }
+        if (!draft.email.hasErrors) {
+          draft.email.checkCount++;
+        }
         return;
       case 'emailUnique':
+        if (action.value) {
+          draft.email.hasErrors = true;
+          draft.email.isUnique = false;
+          draft.email.message = 'This email is already being used.';
+        } else {
+          draft.email.isUnique = true;
+        }
         return;
       case 'passwordImmediately':
         draft.password.hasErrors = false;
@@ -74,6 +104,78 @@ function HomeGuest() {
   }
 
   const [state, dispatch] = useImmerReducer(reducer, initialState);
+
+  useEffect(() => {
+    if (state.username.value) {
+      const delay = setTimeout(() => {
+        dispatch({ type: 'usernameDelay' });
+      }, 600);
+
+      return () => clearTimeout(delay);
+    }
+  }, [state.username.value]);
+
+  useEffect(() => {
+    if (state.email.value) {
+      const delay = setTimeout(() => {
+        dispatch({ type: 'emailDelay' });
+      }, 600);
+
+      return () => clearTimeout(delay);
+    }
+  }, [state.email.value]);
+
+  useEffect(() => {
+    if (state.password.value) {
+      const delay = setTimeout(() => {
+        dispatch({ type: 'passwordDelay' });
+      }, 600);
+
+      return () => clearTimeout(delay);
+    }
+  }, [state.password.value]);
+
+  useEffect(() => {
+    if (state.username.checkCount) {
+      const ourRequest = Axios.CancelToken.source();
+      async function fetchResult() {
+        try {
+          const response = await Axios.post(
+            '/doesUsernameExist',
+            { username: state.username.value },
+            { cancelToken: ourRequest.token }
+          );
+          dispatch({ type: 'usernameUnique', value: response.data });
+        } catch (error) {
+          console.log('error fetch result', error);
+        }
+      }
+      fetchResult();
+      return () => ourRequest.cancel();
+    }
+  }, [state.username.checkCount]);
+
+  useEffect(() => {
+    if (state.email.checkCount) {
+      const ourRequest = Axios.CancelToken.source();
+      async function fetchResult() {
+        try {
+          const response = await Axios.post(
+            '/doesEmailExist',
+            { email: state.email.value },
+            { cancelToken: ourRequest.token }
+          );
+          console.log(response);
+
+          dispatch({ type: 'emailUnique', value: response.data });
+        } catch (error) {
+          console.log('error fetch result', error);
+        }
+      }
+      fetchResult();
+      return () => ourRequest.cancel();
+    }
+  }, [state.email.checkCount]);
 
   function handleSubmit(e) {
     e.preventDefault();
@@ -122,7 +224,7 @@ function HomeGuest() {
               />
               <CSSTransition
                 in={state.username.hasErrors}
-                timeout={300}
+                timeout={500}
                 classNames="liveValidateMessage"
                 unmountOnExit
               >
