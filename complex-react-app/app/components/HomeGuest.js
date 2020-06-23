@@ -95,8 +95,16 @@ function HomeGuest() {
       case 'passwordImmediately':
         draft.password.hasErrors = false;
         draft.password.value = action.value;
+        if (draft.password.value.length > 20) {
+          draft.password.hasErrors = true;
+          draft.password.message = 'Password cannot exceed 20 characters.';
+        }
         return;
       case 'passwordDelay':
+        if (draft.password.value.length < 12) {
+          draft.password.hasErrors = true;
+          draft.password.message = 'Password must be at least 12 characters.';
+        }
         return;
       case 'submitForm':
         return;
@@ -247,6 +255,16 @@ function HomeGuest() {
                 // onChange={e => setEmail(e.target.value)}
                 onChange={e => dispatch({ type: 'emailImmediately', value: e.target.value })}
               />
+              <CSSTransition
+                in={state.email.hasErrors}
+                timeout={500}
+                classNames="liveValidateMessage"
+                unmountOnExit
+              >
+                <div className="alert alert-danger small liveValidateMessage">
+                  {state.email.message}
+                </div>
+              </CSSTransition>
             </div>
             <div className="form-group">
               <label htmlFor="password-register" className="text-muted mb-1">
@@ -261,6 +279,16 @@ function HomeGuest() {
                 // onChange={e => setPassword(e.target.value)}
                 onChange={e => dispatch({ type: 'passwordImmediately', value: e.target.value })}
               />
+              <CSSTransition
+                in={state.password.hasErrors}
+                timeout={500}
+                classNames="liveValidateMessage"
+                unmountOnExit
+              >
+                <div className="alert alert-danger small liveValidateMessage">
+                  {state.password.message}
+                </div>
+              </CSSTransition>
             </div>
             <button type="submit" className="py-3 mt-4 btn btn-lg btn-success btn-block">
               Sign up for ComplexApp
