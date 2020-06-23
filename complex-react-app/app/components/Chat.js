@@ -20,6 +20,7 @@ function Chat() {
 
   useEffect(() => {
     if (appState.isChatOpen) {
+      appDispatch({ type: 'clearUnreadChat' });
       chatField.current.focus();
     }
   }, [appState.isChatOpen]);
@@ -36,6 +37,10 @@ function Chat() {
     // to scroll to the bottom, set the chatLog scrollTop (how far down it will scroll)
     // as the entire height (scroll to very bottom)
     chatLog.current.scrollTop = chatLog.current.scrollHeight;
+
+    if (state.chatMessages.length && !appState.isChatOpen) {
+      appDispatch({ type: 'incrementUnreadChat' });
+    }
   }, [state.chatMessages]);
 
   function handleFieldChange(e) {

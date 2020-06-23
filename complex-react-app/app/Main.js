@@ -53,6 +53,7 @@ function Main() {
     },
     isSearchOpen: false,
     isChatOpen: false,
+    unreadChatCount: 0,
   };
 
   /**
@@ -83,6 +84,12 @@ function Main() {
         return;
       case 'closeChat':
         draft.isChatOpen = false;
+        return;
+      case 'incrementUnreadChat':
+        draft.unreadChatCount++;
+        return;
+      case 'clearUnreadChat':
+        draft.unreadChatCount = 0;
         return;
     }
   }
