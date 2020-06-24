@@ -5,8 +5,8 @@ import { useImmer } from 'use-immer';
 import Page from './Page';
 import StateContext from '../StateContext';
 import ProfilePost from './ProfilePost';
-import ProfileFollowers from './ProfileFollowers';
-import ProfileFollowing from './ProfileFollowing';
+// import ProfileFollowers from './ProfileFollowers';
+// import ProfileFollowing from './ProfileFollowing';
 import ProfileFollow from './ProfileFollow';
 
 function Profile() {
@@ -192,10 +192,34 @@ function Profile() {
           <ProfilePost />
         </Route>
         <Route path="/profile/:username/followers">
-          <ProfileFollow type="followers" />
+          {/* <ProfileFollowers /> */}
+          {state.profileData.counts.followerCount > 0 ? (
+            <ProfileFollow type="followers" />
+          ) : (
+            <div>
+              <p>
+                {state.profileData.profileUsername !== appState.user.username
+                  ? 'This user '
+                  : 'You '}{' '}
+                do not have any followers yet
+              </p>
+            </div>
+          )}
         </Route>
         <Route path="/profile/:username/following">
-          <ProfileFollow type="following" />
+          {/* <ProfileFollowing /> */}
+          {state.profileData.counts.followingCount > 0 ? (
+            <ProfileFollow type="following" />
+          ) : (
+            <div>
+              <p>
+                {state.profileData.profileUsername !== appState.user.username
+                  ? 'This user is '
+                  : 'You are '}{' '}
+                not following anyone yet
+              </p>
+            </div>
+          )}
         </Route>
       </Switch>
     </Page>
