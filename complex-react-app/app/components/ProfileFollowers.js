@@ -3,26 +3,28 @@ import Axios from 'axios';
 import { useParams, Link } from 'react-router-dom';
 import LoadingDotsIcon from './LoadingDotsIcon';
 
-function ProfilePost() {
+function ProfileFollowers() {
   const { username } = useParams();
   const [isLoading, setIsLoading] = useState(true);
-  const [posts, setPosts] = useState([]);
+  const [followers, setFollowers] = useState([]);
 
   useEffect(() => {
     const fetchRequest = Axios.CancelToken.source();
 
-    async function fetchPosts() {
+    async function fetchData() {
       try {
-        const response = await Axios.get(`/profile/${username}/posts`, {
+        const response = await Axios.get(`/profile/${username}/followers`, {
           cancelToken: fetchRequest.token,
         });
-        setPosts(response.data);
+        console.log(response.data);
+
+        setFollowers(response.data);
         setIsLoading(false);
       } catch (error) {
         console.log('error', error);
       }
     }
-    fetchPosts();
+    fetchData();
 
     return () => {
       fetchRequest.cancel();
@@ -32,19 +34,16 @@ function ProfilePost() {
   if (isLoading) return <LoadingDotsIcon />;
   return (
     <div className="list-group">
-      {posts &&
-        posts.map(post => {
-          const date = new Date(post.createdDate);
-          const dateFormatted = `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+      {followers &&
+        followers.map((follower, index) => {
           return (
             <Link
-              key={post._id}
-              to={`/post/${post._id}`}
+              key={index}
+              to={`/profile/${follower.username}`}
               className="list-group-item list-group-item-action"
             >
-              <img className="avatar-tiny" src={post.author.avatar} />{' '}
-              <strong> {post.title} </strong>
-              <span className="text-muted small">on {dateFormatted}</span>
+              <img className="avatar-tiny" src={follower.avatar} />{' '}
+              <strong> {follower.username} </strong>
             </Link>
           );
         })}
@@ -52,4 +51,4 @@ function ProfilePost() {
   );
 }
 
-export default ProfilePost;
+export default ProfileFollowers;
