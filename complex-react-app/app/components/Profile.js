@@ -7,6 +7,7 @@ import StateContext from '../StateContext';
 import ProfilePost from './ProfilePost';
 import ProfileFollowers from './ProfileFollowers';
 import ProfileFollowing from './ProfileFollowing';
+import ProfileFollow from './ProfileFollow';
 
 function Profile() {
   const { username } = useParams();
@@ -191,10 +192,10 @@ function Profile() {
           <ProfilePost />
         </Route>
         <Route path="/profile/:username/followers">
-          <ProfileFollowers />
+          <ProfileFollow type="followers" />
         </Route>
         <Route path="/profile/:username/following">
-          <ProfileFollowing />
+          <ProfileFollow type="following" />
         </Route>
       </Switch>
     </Page>
