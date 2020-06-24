@@ -6,6 +6,7 @@ import Page from './Page';
 import StateContext from '../StateContext';
 import DispatchContext from '../DispatchContext';
 import LoadingDotsIcon from './LoadingDotsIcon';
+import Post from './Post';
 
 function Home() {
   const appState = useContext(StateContext);
@@ -64,25 +65,8 @@ function Home() {
         <>
           <h2 className="text-center mb-4">The Latest From Those You Follow</h2>
           <div className="list-group">
-            {state.feeds.map(feed => {
-              const date = new Date(feed.createdDate);
-              const dateFormatted = `${date.getDate()}/${
-                date.getMonth() + 1
-              }/${date.getFullYear()}`;
-              return (
-                <Link
-                  key={feed._id}
-                  to={`/post/${feed._id}`}
-                  className="list-group-item list-group-item-action"
-                  // onClick={() => appDispatch({ type: 'closeSearch' })}
-                >
-                  <img className="avatar-tiny" src={feed.author.avatar} />{' '}
-                  <strong> {feed.title}</strong>{' '}
-                  <span className="text-muted small">
-                    by {feed.author.username} on {dateFormatted}
-                  </span>
-                </Link>
-              );
+            {state.feeds.map(post => {
+              return <Post key={post._id} post={post} />;
             })}
           </div>
         </>

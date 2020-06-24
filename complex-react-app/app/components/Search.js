@@ -1,8 +1,9 @@
 import React, { useEffect, useContext } from 'react';
 import { useImmer } from 'use-immer';
-import DispatchContext from '../DispatchContext';
-import Axios from 'axios';
 import { Link } from 'react-router-dom';
+import Axios from 'axios';
+import DispatchContext from '../DispatchContext';
+import Post from './Post';
 
 function Search() {
   const appDispatch = useContext(DispatchContext);
@@ -133,23 +134,12 @@ function Search() {
                     {state.results.length > 1 ? 'items' : 'item'} found)
                   </div>
                   {state.results.map(post => {
-                    const date = new Date(post.createdDate);
-                    const dateFormatted = `${date.getDate()}/${
-                      date.getMonth() + 1
-                    }/${date.getFullYear()}`;
                     return (
-                      <Link
+                      <Post
                         key={post._id}
-                        to={`/post/${post._id}`}
-                        className="list-group-item list-group-item-action"
+                        post={post}
                         onClick={() => appDispatch({ type: 'closeSearch' })}
-                      >
-                        <img className="avatar-tiny" src={post.author.avatar} />{' '}
-                        <strong> {post.title}</strong>{' '}
-                        <span className="text-muted small">
-                          by {post.author.username} on {dateFormatted}
-                        </span>
-                      </Link>
+                      />
                     );
                   })}
                 </div>
