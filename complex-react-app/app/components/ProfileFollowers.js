@@ -16,7 +16,7 @@ function ProfileFollowers() {
         const response = await Axios.get(`/profile/${username}/followers`, {
           cancelToken: fetchRequest.token,
         });
-        console.log(response.data);
+        // console.log(response.data);
 
         setFollowers(response.data);
         setIsLoading(false);
