@@ -6,7 +6,7 @@ import { CSSTransition } from 'react-transition-group';
 import StateContext from './StateContext';
 import DispatchContext from './DispatchContext';
 import Axios from 'axios';
-Axios.defaults.baseURL = 'http://localhost:8080';
+Axios.defaults.baseURL = process.env.BACKENDURL || 'http://localhost:8080';
 
 // Component
 import Header from './components/Header';

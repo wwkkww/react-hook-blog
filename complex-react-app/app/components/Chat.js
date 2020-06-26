@@ -6,9 +6,13 @@ import StateContext from '../StateContext';
 import DispatchContext from '../DispatchContext';
 
 // setup url point to server & establish ongoing connection between clien & server
-const socket = io('http://localhost:8080');
+// const socket = io('http://localhost:8080');
 
 function Chat() {
+  // useRef instead of state to prevent recreate of variable.
+  // let browser to consistently hold on to the socket connection
+  const socket = useRef(null);
+
   const chatField = useRef(null);
   const chatLog = useRef(null);
   const appState = useContext(StateContext);
@@ -26,14 +30,18 @@ function Chat() {
   }, [appState.isChatOpen]);
 
   useEffect(() => {
-    socket.on('chatFromServer', message => {
+    // reconnect to socket server every time user login
+    socket.current = io('http://localhost:8080');
+
+    socket.current.on('chatFromServer', message => {
       setState(draft => {
         draft.chatMessages.push(message);
       });
     });
 
     // disconnect socket connection when unmounted (user logout)
-    return () => socket.disconnect();
+    // return () => socket.disconnect();
+    return () => socket.current.disconnect();
   }, []);
 
   useEffect(() => {
@@ -57,7 +65,7 @@ function Chat() {
     e.preventDefault();
     console.log('submit', state.fieldValue);
     // Send message to chat server
-    socket.emit('chatFromBrowser', {
+    socket.current.emit('chatFromBrowser', {
       message: state.fieldValue,
       token: appState.user.token,
     });
