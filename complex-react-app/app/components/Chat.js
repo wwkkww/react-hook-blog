@@ -31,7 +31,8 @@ function Chat() {
 
   useEffect(() => {
     // reconnect to socket server every time user login
-    socket.current = io('http://localhost:8080');
+    // socket.current = io('http://localhost:8080');
+    socket.current = io(process.env.BACKENDURL || 'https://reactcomplexappbackend.herokuapp.com');
 
     socket.current.on('chatFromServer', message => {
       setState(draft => {
