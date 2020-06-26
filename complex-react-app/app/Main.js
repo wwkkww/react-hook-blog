@@ -1,4 +1,4 @@
-import React, { useState, useReducer, useEffect } from 'react';
+import React, { useState, useReducer, useEffect, Suspense } from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter, Switch, Route } from 'react-router-dom';
 import { useImmerReducer } from 'use-immer';
@@ -15,15 +15,20 @@ import Footer from './components/Footer';
 import About from './components/About';
 import Terms from './components/Terms';
 import Home from './components/Home';
-import CreatePost from './components/CreatePost';
-import ViewSinglePost from './components/ViewSinglePost';
+const CreatePost = React.lazy(() => import('./components/CreatePost'));
+// import CreatePost from './components/CreatePost';
+const ViewSinglePost = React.lazy(() => import('./components/ViewSinglePost'));
+// import ViewSinglePost from './components/ViewSinglePost';
 import FlashMessages from './components/FlashMessages';
 import Profile from './components/Profile';
 // import ExampleContext from './ExampleContext';
 import EditPost from './components/EditPost';
 import NotFound from './components/NotFound';
-import Search from './components/Search';
-import Chat from './components/Chat';
+const Search = React.lazy(() => import('./components/Search'));
+// import Search from './components/Search';
+const Chat = React.lazy(() => import('./components/Chat'));
+// import Chat from './components/Chat';
+import LoadingDotsIcon from './components/LoadingDotsIcon';
 
 function Main() {
   /**
@@ -122,44 +127,52 @@ function Main() {
         <BrowserRouter>
           <FlashMessages messages={state.flashMessages} />
           <Header />
-          <Switch>
-            <Route path="/" exact>
-              {state.loggedIn ? <Home /> : <HomeGuest />}
-            </Route>
-            <Route path="/profile/:username">
-              <Profile />
-            </Route>
-            <Route path="/create-post">
-              <CreatePost />
-            </Route>
-            <Route path="/post/:id/edit" exact>
-              <EditPost />
-            </Route>
-            <Route path="/post/:id">
-              <ViewSinglePost />
-            </Route>
-            <Route path="/about-us">
-              <About />
-            </Route>
-            <Route path="/terms">
-              <Terms />
-            </Route>
-            <Route>
-              <NotFound />
-            </Route>
-          </Switch>
+          <Suspense fallback={<LoadingDotsIcon />}>
+            <Switch>
+              <Route path="/" exact>
+                {state.loggedIn ? <Home /> : <HomeGuest />}
+              </Route>
+              <Route path="/profile/:username">
+                <Profile />
+              </Route>
+              <Route path="/create-post">
+                <CreatePost />
+              </Route>
+              <Route path="/post/:id/edit" exact>
+                <EditPost />
+              </Route>
+              <Route path="/post/:id">
+                <ViewSinglePost />
+              </Route>
+              <Route path="/about-us">
+                <About />
+              </Route>
+              <Route path="/terms">
+                <Terms />
+              </Route>
+              <Route>
+                <NotFound />
+              </Route>
+            </Switch>
+          </Suspense>
+
+          {/* CSSTransition will add css to its direct nearest child element */}
           <CSSTransition
             timeout={330}
             in={state.isSearchOpen}
             classNames="search-overlay"
             unmountOnExit
           >
-            <Search />
+            <div className="search-overlay">
+              <Suspense fallback="">
+                <Search />
+              </Suspense>
+            </div>
           </CSSTransition>
           {/* {state.isSearchOpen ? <Search /> : ''} */}
 
           {/* NOTE: do not use CSSTransition because we do no want the chat component to be unmounted when chat is close. Chat needs to be always connected to server */}
-          <Chat />
+          <Suspense fallback="">{state.loggedIn && <Chat />}</Suspense>
           <Footer />
         </BrowserRouter>
       </DispatchContext.Provider>

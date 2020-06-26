@@ -31,6 +31,9 @@ function Chat() {
         draft.chatMessages.push(message);
       });
     });
+
+    // disconnect socket connection when unmounted (user logout)
+    return () => socket.disconnect();
   }, []);
 
   useEffect(() => {
